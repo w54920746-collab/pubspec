@@ -21,8 +21,29 @@ late File seenFile, viewedFile;
 late SharedPreferences prefs;
 final loader = Loader();
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MaterialApp(
+      home: Scaffold(body: Center(child: Text('Запуск...')))));
+  ErrorWidget.builder = (d) => Material(
+      color: Colors.black,
+      child: SingleChildScrollView(
+          child: Text('ОШИБКА: ${d.exception}',
+              style: const TextStyle(color: Colors.redAccent))));
+  try {
+    await realMain();
+  } catch (e, st) {
+    runApp(MaterialApp(
+        home: Scaffold(
+            body: SafeArea(
+                child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Text('ОШИБКА ЗАПУСКА:\n$e\n$st',
+                        style: const TextStyle(color: Colors.redAccent)))))));
+  }
+}
+
+Future<void> realMain() async {
   prefs = await SharedPreferences.getInstance();
   final base = await getApplicationDocumentsDirectory();
   dir = Directory('${base.path}/shorts')..createSync(recursive: true);
