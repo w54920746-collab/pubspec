@@ -1,0 +1,19 @@
+name: shorts_feed
+description: Офлайн лента шортсов с ИИ-отбором
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  video_player: any
+  path_provider: any
+  youtube_explode_dart: any
+  http: any
+  shared_preferences: any
+
+flutter:
+  uses-material-design: true
