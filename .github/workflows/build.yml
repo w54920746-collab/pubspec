@@ -31,11 +31,39 @@ jobs:
           cp /tmp/main.dart lib/main.dart
           cp /tmp/pubspec.yaml pubspec.yaml
 
-      - name: Интернет и отключение Impeller
+      - name: Настроить AndroidManifest для запуска на Android 12+
         run: |
-          sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <application#' android/app/src/main/AndroidManifest.xml
-          sed -i 's#</application>#    <meta-data android:name="io.flutter.embedding.android.EnableImpeller" android:value="false"/>\n    </application>#' android/app/src/main/AndroidManifest.xml
-          cat android/app/src/main/AndroidManifest.xml
+          cat > android/app/src/main/AndroidManifest.xml <<'XML'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET" />
+
+              <application
+                  android:label="shorts_feed"
+                  android:name="${applicationName}"
+                  android:icon="@mipmap/ic_launcher"
+                  android:usesCleartextTraffic="true">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:launchMode="singleTop"
+                      android:theme="@style/LaunchTheme"
+                      android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+                      android:hardwareAccelerated="true"
+                      android:windowSoftInputMode="adjustResize">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          XML
+
+      - name: Отключить Impeller
+        run: |
+          grep -q "io.flutter.embedding.android.EnableImpeller" android/app/src/main/AndroidManifest.xml || \
+          printf '\n    <meta-data android:name="io.flutter.embedding.android.EnableImpeller" android:value="false"/>\n' >> android/app/src/main/AndroidManifest.xml
+          sed -n '1,220p' android/app/src/main/AndroidManifest.xml
 
       - run: flutter pub get
 
